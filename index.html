@@ -121,12 +121,12 @@ function  showChart(itemData, type){
      popupDiv.style.zIndex = '1000'; // 确保弹出框在其他内容之上
      popupDiv.style.display = 'none'; // 初始时隐藏弹出框
      popupDiv.style.width = '90%';
-     popupDiv.style.height = '750px';
+     popupDiv.style.height = '730px';
      popupDiv.id = 'popupDiv';
      // 设置弹出框的内容
      var title = type == 0 ? '胜平负' : '让球胜平负';
      const popupContent = `
-        <h3>${title}-${itemData.matchNumStr}-${itemData.homeTeamAbbName}vs${itemData.awayTeamAbbName}</h3>`;
+        <h3 style="margin: 0;">${title}-${itemData.matchNumStr}-${itemData.homeTeamAbbName}vs${itemData.awayTeamAbbName}</h3>`;
      var tablePP = `<table id="data-table2">
     <thead>  
         <tr>  
