@@ -2,6 +2,7 @@
 <html lang="zh-CN">  
 <head>  
     <meta charset="UTF-8">  
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>最新数据</title>  
     <!-- 这里可以添加其他的头部信息，比如CSS样式表链接、JavaScript脚本链接等 -->  
@@ -71,7 +72,7 @@
   overflow: hidden;
 }
     </style>  	
-	    <script>
+	<script>
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
