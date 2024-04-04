@@ -38,11 +38,12 @@
         background-color: #f9f9f9;  
         border: 1px solid #ccc;  
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
-        z-index: 1000; /* 确保弹出框在其他内容之上 */  
+        z-index: 1000; /* 确保弹出框在其他内容之上 */
+		overflow-y: scroll
     }  
     .close-button {  
         position: absolute; /* 绝对定位 */  
-        bottom: 10px; /* 距离容器底部的距离 */  
+        top: 10px; /* 距离容器底部的距离 */  
         right: 10px; /* 距离容器右侧的距离 */  
         cursor: pointer; /* 鼠标悬停时变为手形图标 */  
         background-color: red; /* 按钮背景色 */  
@@ -80,6 +81,37 @@ function  showChart(itemData, type){
 		     var data = JSON.parse(xhr2.responseText);
              console.log(data);
 			 var chartDom = document.getElementById('main');
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChart2(itemData, type){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate2?matchId='+itemData.matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById('main2');
              var myChart = echarts.init(chartDom, null, {
                  renderer: 'canvas',
                   useDirtyRect: false
@@ -151,6 +183,7 @@ function  showChart(itemData, type){
              tablePP = tablePP + `</tbody>
 </table>
 <div id="main" class= "chart-dev"></div>
+<div id="main2" class= "chart-dev"></div>
 <button class="close-button">关闭</button>`;
              popupDiv.innerHTML = popupContent + tablePP;
 
@@ -167,7 +200,7 @@ function  showChart(itemData, type){
              // 显示弹出框
              popupDiv.style.display = 'block';
 			 showChart(itemData,type);
-
+             showChart2(itemData,type);
              // 您还可以添加其他的逻辑，比如动画效果等
          } else {
              // 请求失败，处理错误
