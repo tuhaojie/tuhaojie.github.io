@@ -109,6 +109,9 @@ window.onload = function() {
   // 页面加载后调用的函数
   fetchData();
 };
+function jupUrl(itemData){
+window.location.href = "ypdb.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName;
+}
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -363,8 +366,20 @@ function  showChart2(itemData, type){
                         <td>${item.homeRank}${item.homeTeamAbbName}</td> 
                         <td></td>						
                         <td>${item.awayRank}${item.awayTeamAbbName}</td>
-                        <td></td>
                     `;
+					const td1 = document.createElement('td');
+                         const btn1 = document.createElement('button');
+                         btn1.classList.add('open-button');
+                         btn1.textContent = '亚';
+                         btn1.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn1.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             jupUrl(itemData);
+                         });
+                         td1.appendChild(btn1);
+                         row1.appendChild(td1);
                          row2.innerHTML = `
                         <td>支持量比例</td>  
                         <td style="${hClass}">${hSupportRate}</td> 
