@@ -296,7 +296,7 @@ function  showChart2(itemData, type){
                                  hhadBettingSingle = item1.bettingSingle;
                              }
                          });
-                         var h = item.had.h == undefined ? '/' : item.had.h
+                             var h = item.had.h == undefined ? '/' : item.had.h
                              var d = item.had.d == undefined ? '/' : item.had.d
                              var a = item.had.a == undefined ? '/' : item.had.a
                              var hProbability = had == undefined ? '/' : had.hProbability
@@ -353,7 +353,41 @@ function  showChart2(itemData, type){
                              var hwinY = hhad == undefined ? '/' : count(htotal, hwinM, '-')
                              var hdrawY = hhad == undefined ? '/' : count(htotal, hdrawM, '-')
                              var hloseY = hhad == undefined ? '/' : count(htotal, hloseM, '-')
-                             const row1 = document.createElement('tr');
+					    var goalLine = parseInt(item.hhad.goalLine);
+			var hh = 0;
+            var hd = 0;
+            var da = 0;
+            var aa = 0;
+            var memo = "";
+            var content = "";
+            if (goalLine < 0) {
+                hh = count(winY, hwinY, '+');
+                memo = memo + (hh >= 0 ? "胜+让胜盈利：" + hh +"<br>" : "");
+                content = content + (hh < 0 ? "胜+让胜亏损：" + hh + "<br>" : "");
+                hd = count(winY, hdrawY, '+');
+                memo = memo + (hd >= 0 ? "胜+让平盈利：" + hd  + "<br>" : "");
+                content = content + (hd < 0 ? "胜+让平亏损：" + hd  + "<br>" : "");
+                da = count(drawY, hloseY, '+');
+                memo = memo + (da >= 0 ? "平+让负盈利：" + da  + "<br>" : "");
+                content = content + (da < 0 ? "平+让负亏损：" + da  + "<br>" : "");
+                aa = count(loseY, hloseY, '+');
+                memo = memo + (aa >= 0 ? "负+让负盈利：" + aa  + "<br>" : "");
+                content = content + (aa < 0 ? "负+让负亏损：" + aa  + "<br>" : "");
+            } else {
+                hh = count(loseY, hloseY, '+');
+                memo = memo + (hh >= 0 ? "负+让负盈利：" + hh  + "<br>" : "");
+                content = content + (hh < 0 ? "负+让负亏损：" + hh  + "<br>" : "");
+                hd =count(loseY, hdrawY, '+');
+                memo = memo + (hd >= 0 ? "负+让平盈利：" + hd  + "<br>" : "");
+                content = content + (hd < 0 ? "负+让平亏损：" + hd  + "<br>" : "");
+                da = count(drawY, hwinY, '+');
+                memo = memo + (da >= 0 ? "平+让胜盈利：" + da  + "<br>" : "");
+                content = content + (da < 0 ? "平+让胜亏损：" + da  + "<br>" : "");
+                aa = count(winY, hwinY, '+');
+                memo = memo + (aa >= 0 ? "胜+让胜盈利：" + aa  + "<br>" : "");
+                content = content + (aa < 0 ? "胜+让胜亏损：" + aa  + "<br>" : "");
+            }
+                        const row1 = document.createElement('tr');
                          const row2 = document.createElement('tr');
                          const row3 = document.createElement('tr');
                          const row4 = document.createElement('tr');
@@ -528,6 +562,16 @@ function  showChart2(itemData, type){
                         <td colspan="5" style="text-align: center; vertical-align: middle; background: #ff5f5f;">下一场</td> 
                         
                     `;
+					 const row17 = document.createElement('tr');
+					  const row18 = document.createElement('tr');
+					   row17.innerHTML = `
+                        <td>盈利选项</td>  
+                        <td colspan="4">${memo}</td> 
+                    `;
+					 row18.innerHTML = `
+                        <td>亏损选项</td>  
+                        <td colspan="4">${content}</td> 
+                    `;
                          tableBody.appendChild(row1);
                          tableBody.appendChild(row2);
                          tableBody.appendChild(row3);
@@ -543,7 +587,9 @@ function  showChart2(itemData, type){
                          tableBody.appendChild(row14);
                          tableBody.appendChild(row15);
                          tableBody.appendChild(row16);
-                         tableBody.appendChild(row9);
+						 tableBody.appendChild(row17);
+						 tableBody.appendChild(row18);
+						 tableBody.appendChild(row9);
 						 
                      });
                  } else {
@@ -609,6 +655,7 @@ function  showChart2(itemData, type){
 <body>  
  <button onclick="fetchData()" class = "pretty-btn">刷新</button>  
  <a href="history.html" class= "beautified-link">回顾</a>
+  <a href="history2.html" class= "beautified-link">回顾2</a>
  <table id="data-table">  
     <thead>  
         <tr>  
