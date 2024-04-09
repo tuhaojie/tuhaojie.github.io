@@ -6,7 +6,7 @@
     <title>历史数据</title>  
     <!-- 这里可以添加其他的头部信息，比如CSS样式表链接、JavaScript脚本链接等 -->  
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-	 <!--<script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script> -->
+	 <script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
 	 <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
 <style>  
  /* 假设 body 是滚动容器 */  
@@ -109,11 +109,11 @@
   // 页面加载后调用的函数
   fetchData();
 };
-/**
+
 document.addEventListener('DOMContentLoaded', function() {
          var vConsole = new window.VConsole();
          vConsole.init();
-    }); */
+    });
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -381,7 +381,7 @@ function  showChart2(itemData, type){
 <body>  
  <a href="index.html" class= "beautified-link">前往今日赛事</a>
   <button onclick="fetchData()" class = "pretty-btn">刷新</button>  
- <table id="data-table">  
+ <table id="data-table" style="font-size: 12px;">  
     <thead>  
         <tr>  
             <th>编号</th>		
