@@ -421,16 +421,16 @@ function  showChart2(itemData, type){
                     const row1 = document.createElement('tr');
 					if(item.bettingSingle == 1){
 					    row1.innerHTML = `
-                        <td rowspan='2'><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">${item.popularity}</div></td>  	
-						<td rowspan='2'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td rowspan='3'><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">${item.popularity}</div></td>  	
+						<td rowspan='3'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
                         <td>${item.winMoney}</td>	
                         <td>${item.goalLineMoney}</td>						
                         <td>${item.sectionsNo999}</td>
                     `;
 					}else{
                         row1.innerHTML = `
-                        <td rowspan='2'>${item.popularity}</td> 				
-                        <td rowspan='2'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td rowspan='3'>${item.popularity}</td> 				
+                        <td rowspan='3'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
                         <td>${item.winMoney}</td>	
                         <td>${item.goalLineMoney}</td>						
                         <td>${item.sectionsNo999}</td>
@@ -440,7 +440,13 @@ function  showChart2(itemData, type){
                      row2.innerHTML = ` 
                         <td>${item.h}</td>	
                         <td>${item.d}</td>						
-                        <td>${item.a}</td>	`				 
+                        <td>${item.a}</td>	`
+                     const row3 = document.createElement('tr');	
+                     row3.innerHTML = ` 
+                        <td>${item.value1}</td>	
+                        <td>${item.value2}</td>						
+                        <td>${item.value3}</td>
+                        <td>${item.companyName}</td>						`						
                          const td3 = document.createElement('td');
 						 const td4 = document.createElement('td');
                          const btn3 = document.createElement('button');
@@ -471,13 +477,16 @@ function  showChart2(itemData, type){
 						 if(item.status == 0){
 						     row1.style.background = "#87df87";
 							 row2.style.background = "#87df87";
+							 row3.style.background = "#87df87";
 						 }else{
 						 	 row1.style.background = " rgb(239 112 111)";
 							 row2.style.background = " rgb(239 112 111)";
+							 row3.style.background = " rgb(239 112 111)";
 						 }
 						
                          tableBody.appendChild(row1);
 						 tableBody.appendChild(row2);
+						 tableBody.appendChild(row3);
                      });
          } else {
              // 请求失败，处理错误
