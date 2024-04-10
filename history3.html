@@ -66,6 +66,7 @@
 .chart-dev {
     height: 300px;
     top: 20px;
+	  padding-bottom:20px;
 }
 	#chart-container {
   position: relative;
@@ -110,6 +111,20 @@ h3 {
     padding-bottom: 10px; /* 添加底部填充 */
     margin-bottom: 10px; /* 添加底部外边距 */
   }
+   .tab-content { display: none; }
+    .tab {
+    display: inline-block;
+    background-color: #ddd;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  .tab.active {
+    background-color: #4CAF50; /* 绿色背景表示激活状态 */
+    color: white;
+  }
     </style>  	
 	<script>
 	var h;
@@ -118,6 +133,7 @@ h3 {
 	var value;
     var homeTeam;
 	var awayTeam;
+	var matchId ;
 	window.onload = function() {
   // 页面加载后调用的函数
   var name = getQueryParams();
@@ -125,6 +141,7 @@ h3 {
   h = name.h;
   d = name.d;
   a = name.a;
+  matchId= name.matchId;
   var goalLine = parseInt(name.goalLine);
   if(goalLine>0){
   value = a;
@@ -135,6 +152,8 @@ h3 {
   awayTeam = name.awayTeam;
   var title = document.getElementById('title');
   title.innerHTML = homeTeam + "VS" + awayTeam + "<br>胜："+h+"  平："+d+"  负："+a;
+  // 初始化：显示第一个tab内容
+  openTab('home1',1);
   fetchData();
 };
 
@@ -151,6 +170,92 @@ function getQueryParams() {
          var vConsole = new window.VConsole();
          vConsole.init();
     });*/
+	
+function openTab(tabName,type) {
+  // 获取所有tab内容和tab按钮
+  var tabContentElements = document.getElementsByClassName("tab-content");
+  var tabButtons = document.getElementsByClassName("tab");
+
+  // 隐藏所有tab内容，移除所有tab按钮的激活状态
+  for (var i = 0; i < tabContentElements.length; i++) {
+    tabContentElements[i].style.display = "none";
+    tabButtons[i].classList.remove("active");
+  }
+
+  // 显示选中的tab内容，给对应的tab按钮添加激活状态
+  document.getElementById(tabName).style.display = "block";
+  var selectedTab = document.getElementById(tabName).previousElementSibling;
+  selectedTab.classList.add("active");
+  if(type == 1 ){
+  showChartCustom(matchId, 0,tabName);
+  }else{
+  showChart2Custom(matchId, 0,tabName);
+  }
+  
+  
+}
+function  showChartCustom(matchId, type,name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById(name);
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChart2Custom(matchId, type,name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate2?matchId='+matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById(name);
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -428,7 +533,13 @@ function  showChart2(itemData, type){
 <body>  
  <a href="index.html" class= "beautified-link">前往今日赛事</a>
   <button onclick="fetchData()" class = "pretty-btn">刷新</button>
-<h3 id="title"></h3>  
+<h3 id="title"></h3>
+<div class="tabs">
+  <button class="tab" onclick="openTab('home1',1)">历史支持量</button>
+  <button class="tab" onclick="openTab('home2',2)">历史盈亏</button>
+</div>
+<div id="home1" class= "chart-dev tab-content"></div>
+<div id="home2" class= "chart-dev tab-content"></div>  
  <table id="data-table" style="font-size: 16px;">  
     <thead>  
         <tr>  

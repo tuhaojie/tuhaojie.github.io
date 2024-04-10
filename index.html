@@ -111,7 +111,7 @@ function jupUrl(itemData){
 window.location.href = "ypdb.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName;
 }
 function jupUrl2(itemData){
-window.location.href = "history3.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName+"&h="+itemData.had.h+"&d="+itemData.had.d+"&a="+itemData.had.a+"&goalLine="+itemData.hhad.goalLine;
+window.location.href = "history3.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName+"&h="+itemData.had.h+"&d="+itemData.had.d+"&a="+itemData.had.a+"&goalLine="+itemData.hhad.goalLine +"&matchId="+itemData.matchId ;
 }
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
