@@ -113,6 +113,36 @@ window.location.href = "ypdb.html?name="+itemData.matchNumStr+"&homeTeam="+itemD
 function jupUrl2(itemData){
 window.location.href = "history3.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName+"&h="+itemData.had.h+"&d="+itemData.had.d+"&a="+itemData.had.a+"&goalLine="+itemData.hhad.goalLine +"&matchId="+itemData.matchId ;
 }
+function  get365YaList(){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/get365YaList';
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 data.forEach(item => {
+			     var row999 = document.getElementById(item.date);
+				 if(row999 !=null && row999 != undefined){
+				 row999.style.background = 'cornflowerblue';
+				  row999.innerHTML = `
+                        <td>${item.companyName}</td>  
+                        <td>${item.value4}</td> 
+                        <td>${item.value5}</td>						
+                        <td>${item.value6}</td>
+                        <td></td>
+                    `;
+				 }
+             });
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -495,6 +525,8 @@ function  showChart2(itemData, type){
                         <td>${loseY}</td>
                         <td></td>
                     `;
+					 const row999 = document.createElement('tr');
+					 row999.id = item.matchNumStr;
                          const row9 = document.createElement('tr');
                          const row10 = document.createElement('tr');
                          const row11 = document.createElement('tr');
@@ -593,6 +625,7 @@ function  showChart2(itemData, type){
                          tableBody.appendChild(row6);
                          tableBody.appendChild(row7);
                          tableBody.appendChild(row8);
+						 tableBody.appendChild(row999);
                          tableBody.appendChild(row10);
                          tableBody.appendChild(row11);
                          tableBody.appendChild(row12);
@@ -603,8 +636,8 @@ function  showChart2(itemData, type){
 						 tableBody.appendChild(row17);
 						 tableBody.appendChild(row18);
 						 tableBody.appendChild(row9);
-						 
                      });
+					 get365YaList();
                  } else {
                      // 请求失败，处理错误
                      console.error('请求失败，状态码：', xhr2.status);
