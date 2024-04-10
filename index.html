@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>最新数据</title>  
     <!-- 这里可以添加其他的头部信息，比如CSS样式表链接、JavaScript脚本链接等 -->  
-    <link rel="stylesheet" href="styles.css">
-	<script src="echarts.js"></script>
 	 <script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
 <style>  
  /* 假设 body 是滚动容器 */  
@@ -111,6 +109,9 @@ window.onload = function() {
 };
 function jupUrl(itemData){
 window.location.href = "ypdb.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName;
+}
+function jupUrl2(itemData){
+window.location.href = "history3.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName+"&h="+itemData.had.h+"&d="+itemData.had.d+"&a="+itemData.had.a+"&goalLine="+itemData.hhad.goalLine;
 }
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
@@ -419,8 +420,20 @@ function  showChart2(itemData, type){
                         <td style="${hClass}">${hSupportRate}</td> 
                         <td style="${dClass}">${dSupportRate}</td>						
                         <td style="${aClass}">${aSupportRate}</td>
-                        <td></td>
                     `;
+						const td2 = document.createElement('td');
+                         const btn2 = document.createElement('button');
+                         btn2.classList.add('open-button');
+                         btn2.textContent = '历';
+                         btn2.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn2.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             jupUrl2(itemData);
+                         });
+                         td2.appendChild(btn2);
+                         row2.appendChild(td2);
                          if (hadBettingSingle == 1) {
                              row3.innerHTML = `
                         <td><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">赔率</div></td>  
