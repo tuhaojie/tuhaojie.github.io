@@ -153,7 +153,7 @@ h3 {
   var title = document.getElementById('title');
   title.innerHTML = homeTeam + "VS" + awayTeam + "<br>胜："+h+"  平："+d+"  负："+a;
   // 初始化：显示第一个tab内容
-  openTab('home1',1);
+  openTab('home1',1,0);
   fetchData();
 };
 
@@ -171,7 +171,7 @@ function getQueryParams() {
          vConsole.init();
     });*/
 	
-function openTab(tabName,type) {
+function openTab(tabName,type,status) {
   // 获取所有tab内容和tab按钮
   var tabContentElements = document.getElementsByClassName("tab-content");
   var tabButtons = document.getElementsByClassName("tab");
@@ -187,9 +187,9 @@ function openTab(tabName,type) {
   var selectedTab = document.getElementById(tabName).previousElementSibling;
   selectedTab.classList.add("active");
   if(type == 1 ){
-  showChartCustom(matchId, 0,tabName);
+  showChartCustom(matchId, status,tabName);
   }else{
-  showChart2Custom(matchId, 0,tabName);
+  showChart2Custom(matchId, status,tabName);
   }
   
   
@@ -535,8 +535,10 @@ function  showChart2(itemData, type){
   <button onclick="fetchData()" class = "pretty-btn">刷新</button>
 <h3 id="title"></h3>
 <div class="tabs">
-  <button class="tab" onclick="openTab('home1',1)">历史支持量</button>
-  <button class="tab" onclick="openTab('home2',2)">历史盈亏</button>
+  <button class="tab" onclick="openTab('home1',1,0)">支持量</button>
+  <button class="tab" onclick="openTab('home2',2,0)">盈亏</button>
+  <button class="tab" onclick="openTab('home1',1,1)">让球量</button>
+  <button class="tab" onclick="openTab('home2',2,1)">让球盈亏</button>
 </div>
 <div id="home1" class= "chart-dev tab-content"></div>
 <div id="home2" class= "chart-dev tab-content"></div>  
