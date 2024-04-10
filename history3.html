@@ -134,6 +134,7 @@ h3 {
     var homeTeam;
 	var awayTeam;
 	var matchId ;
+	var str;
 	window.onload = function() {
   // 页面加载后调用的函数
   var name = getQueryParams();
@@ -141,6 +142,7 @@ h3 {
   h = name.h;
   d = name.d;
   a = name.a;
+  str = name.name;
   matchId= name.matchId;
   var goalLine = parseInt(name.goalLine);
   if(goalLine>0){
@@ -193,6 +195,25 @@ function openTab(tabName,type,status) {
   }
   
   
+}
+function  get365Ya(name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/get365Ya?name='+name;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			   var title = document.getElementById('title');
+               title.innerHTML = title.innerHTML + "<br> 亚盘：" + data.value4 + "  " + data.value5 + "   " + data.value6
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
 }
 function  showChartCustom(matchId, type,name){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+matchId+'&type='+type;
@@ -397,6 +418,7 @@ function  showChart2(itemData, type){
 	
  }
  function fetchData() {
+     get365Ya(str);
      const formattedDate = moment().format("YYYY-MM-DD");
 	 const today = moment();
 	 const twoDaysAgo = today.subtract(2, 'days');
