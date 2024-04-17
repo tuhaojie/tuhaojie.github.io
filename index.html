@@ -300,7 +300,10 @@ function  showChart2(itemData, type){
              // 你可以在这里将数据插入到HTML元素中，或者执行其他操作
              var value = data.value;
              var matchInfoList = value.matchInfoList;
-             var subMatchList = matchInfoList[0].subMatchList;
+             var subMatchList = new Array();
+			 matchInfoList.forEach(item =>{
+				Array.prototype.push.apply(subMatchList, item.subMatchList);
+			 });
              subMatchList.forEach(item => {
                  matchIds = matchIds + item.matchId + ','
              });
