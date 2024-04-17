@@ -205,6 +205,59 @@ function  showChart2(itemData, type){
      xhr2.open('GET', url2, true);
      xhr2.send();
 }
+ function showChange(btn, itemData) {
+     const popupDiv1111 = document.getElementById('popupDiv');
+     if (popupDiv1111 != undefined) {
+         popupDiv1111.remove();
+     }
+     // 创建弹出框元素
+     const popupDiv = document.createElement('div');
+     popupDiv.classList.add('popup');
+     popupDiv.style.position = 'fixed';
+     popupDiv.style.top = '20px'; // 加一些间距
+     //popupDiv.style.left = `${btn.getBoundingClientRect().left}px`;
+     popupDiv.style.padding = '10px';
+     popupDiv.style.backgroundColor = 'rgba(245, 245, 245, 0.90)';
+     popupDiv.style.border = '1px solid gray';
+     popupDiv.style.zIndex = '1000'; // 确保弹出框在其他内容之上
+     popupDiv.style.display = 'none'; // 初始时隐藏弹出框
+     popupDiv.style.width = '90%';
+     popupDiv.style.height = '730px';
+     popupDiv.id = 'popupDiv';
+     // 设置弹出框的内容
+     var url = 'http://thj0425.gnway.cc/match/getMatchChange?matchId=' + itemData.matchId;
+     // 创建一个新的HTTP请求
+     var xhr = new XMLHttpRequest();
+     xhr.onload = function () {
+         if (xhr.status === 200) {
+             var data = JSON.parse(xhr.responseText);
+             console.log(data);
+             popupDiv.innerHTML = `<p>下降比分：${data.crsDown}</p><br><p>上升比分：${data.crsUP}</p><br><p>下降球数：${data.ttgDown}</p><br><p>上升球数：${data.ttgUP}</p><br><p>下降半全：${data.hafuDown}</p><br><p>上升半全：${data.hafuUP}</p><br><button class="close-button">关闭</button>`;
+
+             // 显示弹出框
+             const popupContainer = document.getElementById('popupContainer');
+             popupContainer.appendChild(popupDiv);
+
+             // 为关闭按钮添加点击事件监听器
+             const closeBtn = popupDiv.querySelector('.close-button');
+             closeBtn.addEventListener('click', function () {
+                 popupDiv.remove(); // 隐藏弹出框
+             });
+
+             // 显示弹出框
+             popupDiv.style.display = 'block';
+             // 您还可以添加其他的逻辑，比如动画效果等
+         } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr.open('GET', url, true);
+     xhr.send();
+	
+ }
  function showPopup(btn, itemData, type) {
      const popupDiv1111 = document.getElementById('popupDiv');
      if (popupDiv1111 != undefined) {
@@ -500,8 +553,20 @@ function  showChart2(itemData, type){
                         <td>${hProbability}</td> 
                         <td>${dProbability}</td>						
                         <td>${aProbability}</td>
-                        <td></td>
                     `;
+					     const td4 = document.createElement('td');
+                         const btn4 = document.createElement('button');
+                         btn4.classList.add('open-button');
+                         btn4.textContent = '比';
+                         btn4.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn4.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             showChange(this, itemData);
+                         });
+                         td4.appendChild(btn4);
+                         row4.appendChild(td4);
                          row5.innerHTML = `
                         <td>支持量</td>  
                         <td>${win}</td> 
