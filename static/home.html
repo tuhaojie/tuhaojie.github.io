@@ -1,0 +1,787 @@
+<!DOCTYPE html>  
+<html lang="zh-CN">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>最新数据</title>  
+    <!-- 这里可以添加其他的头部信息，比如CSS样式表链接、JavaScript脚本链接等 -->  
+	 <script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
+<style>  
+ /* 假设 body 是滚动容器 */  
+        body {  
+		
+            position: relative; /* 确保绝对定位的 popup-div 是相对于 body 定位的 */  
+            overflow-x: hidden; /* 防止水平滚动条出现 */  
+        }  
+        table {  
+            border-collapse: collapse;  
+            width: 100%;  
+        }  
+        th, td {  
+            text-align: left;  
+            padding: 8px;  
+            border-bottom: 1px solid #5f4f4f;  
+			text-align: center
+        }  
+        tr:hover {background-color: #f5f5f5;}  
+		 /* 样式放在这里 */  
+    .popupContainer {  
+        position: relative; /* 确保绝对定位的弹出框相对于这个容器定位 */  
+        height: 100vh; /* 视口高度，用于确保弹出框在整个页面上可见 */  
+    }  
+    .popup {  
+        position: fixed;  
+        top: 50%;  
+        padding: 20px;  
+        background-color: #f9f9f9;  
+        border: 1px solid #ccc;  
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+        z-index: 1000; /* 确保弹出框在其他内容之上 */
+		overflow-y: scroll
+    }  
+    .close-button {  
+        position: absolute; /* 绝对定位 */  
+        top: 10px; /* 距离容器底部的距离 */  
+        right: 10px; /* 距离容器右侧的距离 */  
+        cursor: pointer; /* 鼠标悬停时变为手形图标 */  
+        background-color: red; /* 按钮背景色 */  
+        color: white; /* 按钮文本颜色 */  
+        border: none; /* 无边框 */  
+        padding: 5px 10px; /* 内边距 */  
+        font-size: 14px; /* 字体大小 */ 
+        overflow-y: scroll;		
+    }  
+    .open-button{
+       background-color: #1fcff9; /* 按钮背景色 */  
+        color: white; /* 按钮文本颜色 */  
+        border: none; /* 无边框 */   
+        font-size: 14px; /* 字体大小 */  
+	}
+    .close-button:hover {  
+        background-color: darkred; /* 鼠标悬停时的背景色 */  
+    }
+	
+.pretty-btn {
+  background-color: #4CAF50; /* 绿色背景 */
+  border: none; /* 无边框 */
+  color: white; /* 白色文本 */
+  padding: 10px 10px; /* 内边距 */
+  text-align: center; /* 文本居中 */
+  text-decoration: none; /* 无文本装饰 */
+  display: inline-block; /* 行内块显示 */
+  font-size: 14px; /* 字体大小 */
+  margin: 4px 2px; /* 外边距 */
+  cursor: pointer; /* 手形鼠标光标 */
+  border-radius: 10px; /* 圆角边框 */
+  transition: all 0.3s; /* 过渡效果 */
+}
+.chart-dev {
+    height: 300px;
+    top: 20px;
+}
+	#chart-container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+.beautified-link {
+    /* 文字颜色 */
+    color: #555;
+    /* 文字大小 */
+    font-size: 14px;
+    /* 文字装饰 */
+    text-decoration: none;
+    /* 背景颜色 */
+    background-color: #f0f0f0;
+    /* 边框 */
+    border: 1px solid #ddd;
+    /* 圆角 */
+    border-radius: 5px;
+    /* 内边距 */
+    padding: 10px 10px;
+    /* 鼠标悬停样式 */
+    }
+    </style>  	
+	<script>
+window.onload = function() {
+  // 页面加载后调用的函数
+  fetchData();
+};
+function jupUrl(itemData){
+window.location.href = "ypdb.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName;
+}
+function jupUrl2(itemData){
+window.location.href = "history3.html?name="+itemData.matchNumStr+"&homeTeam="+itemData.homeTeamAbbName+"&awayTeam="+itemData.awayTeamAbbName+"&h="+itemData.had.h+"&d="+itemData.had.d+"&a="+itemData.had.a+"&goalLine="+itemData.hhad.goalLine +"&matchId="+itemData.matchId ;
+}
+function  get365YaList(){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/get365YaList';
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 data.forEach(item => {
+			     var row999 = document.getElementById(item.date);
+				 if(row999 !=null && row999 != undefined){
+				 row999.style.background = 'cornflowerblue';
+				  row999.innerHTML = `
+                        <td>${item.companyName}</td>  
+                        <td>${item.value4}</td> 
+                        <td>${item.value5}</td>						
+                        <td>${item.value6}</td>
+                        <td></td>
+                    `;
+				 }
+             });
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChart(itemData, type){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById('main');
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChart2(itemData, type){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate2?matchId='+itemData.matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById('main2');
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+ function showChange(btn, itemData) {
+     const popupDiv1111 = document.getElementById('popupDiv');
+     if (popupDiv1111 != undefined) {
+         popupDiv1111.remove();
+     }
+     // 创建弹出框元素
+     const popupDiv = document.createElement('div');
+     popupDiv.classList.add('popup');
+     popupDiv.style.position = 'fixed';
+     popupDiv.style.top = '20px'; // 加一些间距
+     //popupDiv.style.left = `${btn.getBoundingClientRect().left}px`;
+     popupDiv.style.padding = '10px';
+     popupDiv.style.backgroundColor = 'rgba(245, 245, 245, 0.90)';
+     popupDiv.style.border = '1px solid gray';
+     popupDiv.style.zIndex = '1000'; // 确保弹出框在其他内容之上
+     popupDiv.style.display = 'none'; // 初始时隐藏弹出框
+     popupDiv.style.width = '90%';
+     popupDiv.style.height = '730px';
+     popupDiv.id = 'popupDiv';
+     // 设置弹出框的内容
+     var url = 'http://thj0425.gnway.cc/match/getMatchChange?matchId=' + itemData.matchId;
+     // 创建一个新的HTTP请求
+     var xhr = new XMLHttpRequest();
+     xhr.onload = function () {
+         if (xhr.status === 200) {
+             var data = JSON.parse(xhr.responseText);
+             console.log(data);
+             popupDiv.innerHTML = `<br><p>下降比分：${data.crsDown}</p><br><p>上升比分：${data.crsUP}</p><br><p>下降球数：${data.ttgDown}</p><br><p>上升球数：${data.ttgUP}</p><br><p>下降半全：${data.hafuDown}</p><br><p>上升半全：${data.hafuUP}</p><br><button class="close-button">关闭</button>`;
+
+             // 显示弹出框
+             const popupContainer = document.getElementById('popupContainer');
+             popupContainer.appendChild(popupDiv);
+
+             // 为关闭按钮添加点击事件监听器
+             const closeBtn = popupDiv.querySelector('.close-button');
+             closeBtn.addEventListener('click', function () {
+                 popupDiv.remove(); // 隐藏弹出框
+             });
+
+             // 显示弹出框
+             popupDiv.style.display = 'block';
+             // 您还可以添加其他的逻辑，比如动画效果等
+         } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr.open('GET', url, true);
+     xhr.send();
+	
+ }
+ function showPopup(btn, itemData, type) {
+     const popupDiv1111 = document.getElementById('popupDiv');
+     if (popupDiv1111 != undefined) {
+         popupDiv1111.remove();
+     }
+     // 创建弹出框元素
+     const popupDiv = document.createElement('div');
+     popupDiv.classList.add('popup');
+     popupDiv.style.position = 'fixed';
+     popupDiv.style.top = '20px'; // 加一些间距
+     //popupDiv.style.left = `${btn.getBoundingClientRect().left}px`;
+     popupDiv.style.padding = '10px';
+     popupDiv.style.backgroundColor = 'rgba(245, 245, 245, 0.90)';
+     popupDiv.style.border = '1px solid gray';
+     popupDiv.style.zIndex = '1000'; // 确保弹出框在其他内容之上
+     popupDiv.style.display = 'none'; // 初始时隐藏弹出框
+     popupDiv.style.width = '90%';
+     popupDiv.style.height = '730px';
+     popupDiv.id = 'popupDiv';
+     // 设置弹出框的内容
+     var title = type == 0 ? '胜平负' : '让球胜平负';
+     const popupContent = `
+        <h3 style="margin: 0;">${title}-${itemData.matchNumStr}-${itemData.homeTeamAbbName}vs${itemData.awayTeamAbbName}</h3>`;
+     var tablePP = `<table id="data-table2">
+    <thead>  
+        <tr>  
+            <th>时间</th>  
+            <th>胜</th>  
+            <th>平</th>
+            <th>负</th> 		
+        </tr>  
+    </thead>  
+    <tbody id="table-body2">`;
+     var url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + itemData.matchId;
+     // 创建一个新的HTTP请求
+     var xhr = new XMLHttpRequest();
+     xhr.onload = function () {
+         if (xhr.status === 200) {
+             var data = JSON.parse(xhr.responseText);
+             console.log(data);
+             var value1 = type == 0 ? data.value.oddsHistory.hadList : data.value.oddsHistory.hhadList
+                 value1.forEach(item => {
+                 tablePP = tablePP + `<tr><td>${item.updateTime}</td><td>${item.h}</td><td>${item.d}</td><td>${item.a}</td></tr>`
+
+             });
+             tablePP = tablePP + `</tbody>
+</table>
+<div id="main" class= "chart-dev"></div>
+<div id="main2" class= "chart-dev"></div>
+<button class="close-button">关闭</button>`;
+             popupDiv.innerHTML = popupContent + tablePP;
+
+             // 显示弹出框
+             const popupContainer = document.getElementById('popupContainer');
+             popupContainer.appendChild(popupDiv);
+
+             // 为关闭按钮添加点击事件监听器
+             const closeBtn = popupDiv.querySelector('.close-button');
+             closeBtn.addEventListener('click', function () {
+                 popupDiv.remove(); // 隐藏弹出框
+             });
+
+             // 显示弹出框
+             popupDiv.style.display = 'block';
+			 showChart(itemData,type);
+             showChart2(itemData,type);
+             // 您还可以添加其他的逻辑，比如动画效果等
+         } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr.open('GET', url, true);
+     xhr.send();
+	
+ }
+ function fetchData() {
+     // API接口的URL
+     var url = 'https://webapi.sporttery.cn/gateway/jc/football/getMatchCalculatorV1.qry?poolCode=hhad,had&channel=c';
+
+     // 创建一个新的HTTP请求
+     var xhr = new XMLHttpRequest();
+
+     // 定义请求完成后的回调函数
+     xhr.onload = function () {
+         if (xhr.status === 200) {
+             // 请求成功，处理返回的数据
+             var data = JSON.parse(xhr.responseText);
+             console.log(data);
+             var matchIds = '';
+             // 你可以在这里将数据插入到HTML元素中，或者执行其他操作
+             var value = data.value;
+             var matchInfoList = value.matchInfoList;
+             var subMatchList = new Array();
+			 matchInfoList.forEach(item =>{
+				Array.prototype.push.apply(subMatchList, item.subMatchList);
+			 });
+             subMatchList.forEach(item => {
+                 matchIds = matchIds + item.matchId + ','
+             });
+             var url2 = 'https://webapi.sporttery.cn/gateway/jc/common/getSupportRateV1.qry?matchIds=' + matchIds + '&poolCode=hhad,had&sportType=1';
+             // 创建一个新的HTTP请求
+             var xhr2 = new XMLHttpRequest();
+             xhr2.onload = function () {
+                 if (xhr2.status === 200) {
+                     var data2 = JSON.parse(xhr2.responseText);
+                     console.log(data2);
+                     const tableBody = document.getElementById('table-body');
+                     tableBody.innerHTML = '';
+                     // 遍历数据并创建表格行
+                     var value2 = data2.value;
+                     subMatchList.forEach(item => {
+                         const had = value2['_' + item.matchId].HAD;
+                         const hhad = value2['_' + item.matchId].HHAD
+                             var hadBettingSingle = 0;
+                         var hhadBettingSingle = 0;
+                         item.poolList.forEach(item1 => {
+                             if (item1.poolCode == 'HAD') {
+                                 hadBettingSingle = item1.bettingSingle;
+                             } else if (item1.poolCode == 'HHAD') {
+                                 hhadBettingSingle = item1.bettingSingle;
+                             }
+                         });
+                             var h = item.had.h == undefined ? '/' : item.had.h
+                             var d = item.had.d == undefined ? '/' : item.had.d
+                             var a = item.had.a == undefined ? '/' : item.had.a
+                             var hProbability = had == undefined ? '/' : had.hProbability
+                             var dProbability = had == undefined ? '/' : had.dProbability
+                             var aProbability = had == undefined ? '/' : had.aProbability
+                             var hSupportRate = had == undefined ? '/' : had.hSupportRate
+                             var dSupportRate = had == undefined ? '/' : had.dSupportRate
+                             var aSupportRate = had == undefined ? '/' : had.aSupportRate
+							 
+							 var hProbabilityNum = had == undefined ? 0 : parseInt(had.hProbability.replace("%",""));
+                             var dProbabilityNum = had == undefined ? 0 : parseInt(had.dProbability.replace("%",""));
+                             var aProbabilityNum = had == undefined ? 0 : parseInt(had.aProbability.replace("%",""));
+                             var hSupportRateNum = had == undefined ? 0 : parseInt(had.hSupportRate.replace("%",""));
+                             var dSupportRateNum = had == undefined ? 0 : parseInt(had.dSupportRate.replace("%",""));
+                             var aSupportRateNum = had == undefined ? 0 : parseInt(had.aSupportRate.replace("%",""));
+							 
+							 var hClass = (hSupportRateNum - hProbabilityNum)>=20 || (hSupportRateNum - hProbabilityNum)<= -20 ? 'background: red;color: white;' :  (hSupportRateNum - hProbabilityNum)>=10 || (hSupportRateNum - hProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+							 var dClass = (dSupportRateNum - dProbabilityNum)>=20 || (dSupportRateNum - dProbabilityNum)<= -20 ? 'background: red;color: white;' :  (dSupportRateNum - dProbabilityNum)>=10 || (dSupportRateNum - dProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+                             var aClass = (aSupportRateNum - aProbabilityNum)>=20 || (aSupportRateNum - aProbabilityNum)<= -20 ? 'background: red;color: white;' :  (aSupportRateNum - aProbabilityNum)>=10 || (aSupportRateNum - aProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+
+							 var hhProbabilityNum = parseInt(hhad.hProbability.replace("%",""));
+                             var hdProbabilityNum = parseInt(hhad.dProbability.replace("%",""));
+                             var haProbabilityNum = parseInt(hhad.aProbability.replace("%",""));
+                             var hhSupportRateNum = parseInt(hhad.hSupportRate.replace("%",""));
+                             var hdSupportRateNum = parseInt(hhad.dSupportRate.replace("%",""));
+                             var haSupportRateNum = parseInt(hhad.aSupportRate.replace("%",""));
+							 
+							 var hhClass = (hhSupportRateNum - hhProbabilityNum)>=20 || (hhSupportRateNum - hhProbabilityNum)<= -20 ? 'background: red;color: white;' :  (hhSupportRateNum - hhProbabilityNum)>=10 || (hhSupportRateNum - hhProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+                             var hdClass = (hdSupportRateNum - hdProbabilityNum)>=20 || (hdSupportRateNum - hdProbabilityNum)<= -20 ? 'background: red;color: white;' :  (hdSupportRateNum - hdProbabilityNum)>=10 || (hdSupportRateNum - hdProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+                             var haClass = (haSupportRateNum - haProbabilityNum)>=20 || (haSupportRateNum - haProbabilityNum)<= -20 ? 'background: red;color: white;' :  (haSupportRateNum - haProbabilityNum)>=10 || (haSupportRateNum - haProbabilityNum)<= -10 ?  'background: orange;color: white;' : '';
+
+							 
+							 
+                             var win = had == undefined ? '/' : had.win
+                             var draw = had == undefined ? '/' : had.draw
+                             var lose = had == undefined ? '/' : had.lose
+                             var total = had == undefined ? '/' : had.win + had.draw + had.lose
+                             var winM = had == undefined ? '/' : count(had.win, h, '*')
+                             var drawM = had == undefined ? '/' : count(had.draw, d, '*')
+                             var loseM = had == undefined ? '/' : count(had.lose, a, '*')
+                             var winY = had == undefined ? '/' : count(total, winM, '-')
+                             var drawY = had == undefined ? '/' : count(total, drawM, '-')
+                             var loseY = had == undefined ? '/' : count(total, loseM, '-')
+                             var hhSupportRate = hhad == undefined ? '/' : hhad.hSupportRate
+                             var hdSupportRate = hhad == undefined ? '/' : hhad.dSupportRate
+                             var haSupportRate = hhad == undefined ? '/' : hhad.aSupportRate
+                             var hwin = hhad == undefined ? '/' : hhad.win
+                             var hdraw = hhad == undefined ? '/' : hhad.draw
+                             var hlose = hhad == undefined ? '/' : hhad.lose
+                             var htotal = hhad == undefined ? '/' : hhad.win + hhad.draw + hhad.lose
+                             var hwinM = hhad == undefined ? '/' : count(hhad.win, item.hhad.h, '*')
+                             var hdrawM = hhad == undefined ? '/' : count(hhad.draw, item.hhad.d, '*')
+                             var hloseM = hhad == undefined ? '/' : count(hhad.lose, item.hhad.a, '*')
+                             var hwinY = hhad == undefined ? '/' : count(htotal, hwinM, '-')
+                             var hdrawY = hhad == undefined ? '/' : count(htotal, hdrawM, '-')
+                             var hloseY = hhad == undefined ? '/' : count(htotal, hloseM, '-')
+					    var goalLine = parseInt(item.hhad.goalLine);
+			var hh = 0;
+            var hd = 0;
+            var da = 0;
+            var aa = 0;
+            var memo = "";
+            var content = "";
+            if (goalLine < 0) {
+                hh = count(winY, hwinY, '+');
+                memo = memo + (hh >= 0 ? "胜+让胜盈利：" + hh +"<br>" : "");
+                content = content + (hh < 0 ? "胜+让胜亏损：" + hh + "<br>" : "");
+                hd = count(winY, hdrawY, '+');
+                memo = memo + (hd >= 0 ? "胜+让平盈利：" + hd  + "<br>" : "");
+                content = content + (hd < 0 ? "胜+让平亏损：" + hd  + "<br>" : "");
+                da = count(drawY, hloseY, '+');
+                memo = memo + (da >= 0 ? "平+让负盈利：" + da  + "<br>" : "");
+                content = content + (da < 0 ? "平+让负亏损：" + da  + "<br>" : "");
+                aa = count(loseY, hloseY, '+');
+                memo = memo + (aa >= 0 ? "负+让负盈利：" + aa  + "<br>" : "");
+                content = content + (aa < 0 ? "负+让负亏损：" + aa  + "<br>" : "");
+            } else {
+                hh = count(loseY, hloseY, '+');
+                memo = memo + (hh >= 0 ? "负+让负盈利：" + hh  + "<br>" : "");
+                content = content + (hh < 0 ? "负+让负亏损：" + hh  + "<br>" : "");
+                hd =count(loseY, hdrawY, '+');
+                memo = memo + (hd >= 0 ? "负+让平盈利：" + hd  + "<br>" : "");
+                content = content + (hd < 0 ? "负+让平亏损：" + hd  + "<br>" : "");
+                da = count(drawY, hwinY, '+');
+                memo = memo + (da >= 0 ? "平+让胜盈利：" + da  + "<br>" : "");
+                content = content + (da < 0 ? "平+让胜亏损：" + da  + "<br>" : "");
+                aa = count(winY, hwinY, '+');
+                memo = memo + (aa >= 0 ? "胜+让胜盈利：" + aa  + "<br>" : "");
+                content = content + (aa < 0 ? "胜+让胜亏损：" + aa  + "<br>" : "");
+            }
+                        const row1 = document.createElement('tr');
+                         const row2 = document.createElement('tr');
+                         const row3 = document.createElement('tr');
+                         const row4 = document.createElement('tr');
+                         const row5 = document.createElement('tr');
+                         const row6 = document.createElement('tr');
+                         const row7 = document.createElement('tr');
+                         const row8 = document.createElement('tr');
+                         row1.innerHTML = `
+                        <td>${item.matchNumStr}</td>  
+                        <td>${item.homeRank}${item.homeTeamAbbName}</td> 
+                        <td></td>						
+                        <td>${item.awayRank}${item.awayTeamAbbName}</td>
+                    `;
+					const td1 = document.createElement('td');
+                         const btn1 = document.createElement('button');
+                         btn1.classList.add('open-button');
+                         btn1.textContent = '亚';
+                         btn1.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn1.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             jupUrl(itemData);
+                         });
+                         td1.appendChild(btn1);
+                         row1.appendChild(td1);
+                         row2.innerHTML = `
+                        <td>支持量比例</td>  
+                        <td style="${hClass}">${hSupportRate}</td> 
+                        <td style="${dClass}">${dSupportRate}</td>						
+                        <td style="${aClass}">${aSupportRate}</td>
+                    `;
+						const td2 = document.createElement('td');
+                         const btn2 = document.createElement('button');
+                         btn2.classList.add('open-button');
+                         btn2.textContent = '历';
+                         btn2.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn2.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             jupUrl2(itemData);
+                         });
+                         td2.appendChild(btn2);
+                         row2.appendChild(td2);
+                         if (hadBettingSingle == 1) {
+                             row3.innerHTML = `
+                        <td><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">赔率</div></td>  
+                        <td>${h}</td> 
+                        <td>${d}</td>						
+                        <td>${a}</td>
+                    `;
+                         } else {
+                             row3.innerHTML = `
+                        <td>赔率</td>  
+                        <td>${h}</td> 
+                        <td>${d}</td>						
+                        <td>${a}</td>
+                    `;
+                         }
+                         const td3 = document.createElement('td');
+                         const btn3 = document.createElement('button');
+                         btn3.classList.add('open-button');
+                         btn3.textContent = '变';
+                         btn3.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn3.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             showPopup(this, itemData, 0);
+                         });
+                         td3.appendChild(btn3);
+                         row3.appendChild(td3);
+                         row4.innerHTML = `
+                        <td>赔率胜率</td>  
+                        <td>${hProbability}</td> 
+                        <td>${dProbability}</td>						
+                        <td>${aProbability}</td>
+                    `;
+					     const td4 = document.createElement('td');
+                         const btn4 = document.createElement('button');
+                         btn4.classList.add('open-button');
+                         btn4.textContent = '比';
+                         btn4.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn4.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             showChange(this, itemData);
+                         });
+                         td4.appendChild(btn4);
+                         row4.appendChild(td4);
+                         row5.innerHTML = `
+                        <td>支持量</td>  
+                        <td>${win}</td> 
+                        <td>${draw}</td>						
+                        <td>${lose}</td>
+                        <td></td>
+                    `;
+                         row6.innerHTML = `
+                        <td>总奖池</td>  
+                        <td colspan="3" style="text-align: center; vertical-align: middle; ">${total}</td> 
+                        <td></td>
+                    `;
+                         row7.innerHTML = `
+                        <td>奖池赔付</td>  
+                        <td>${winM}</td> 
+                        <td>${drawM}</td>						
+                        <td>${loseM}</td>
+                        <td></td>
+                    `;
+                         row8.innerHTML = `
+                        <td>庄家盈亏</td>  
+                        <td>${winY}</td> 
+                        <td>${drawY}</td>						
+                        <td>${loseY}</td>
+                        <td></td>
+                    `;
+					 const row999 = document.createElement('tr');
+					 row999.id = item.matchNumStr;
+                         const row9 = document.createElement('tr');
+                         const row10 = document.createElement('tr');
+                         const row11 = document.createElement('tr');
+                         const row12 = document.createElement('tr');
+                         const row13 = document.createElement('tr');
+                         const row14 = document.createElement('tr');
+                         const row15 = document.createElement('tr');
+                         const row16 = document.createElement('tr');
+                         row10.innerHTML = `
+                        <td>${item.hhad.goalLine}支持量比例</td>  
+                        <td style="${hhClass}">${hhSupportRate}</td> 
+                        <td style="${hdClass}">${hdSupportRate}</td>						
+                        <td style="${haClass}">${haSupportRate}</td>
+                        <td></td>
+                    `;
+					 if (hhadBettingSingle == 1) {
+                             row11.innerHTML = `
+                        <td><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">赔率</div></td>  
+                          <td>${item.hhad.h}</td> 
+                        <td>${item.hhad.d}</td>						
+                        <td>${item.hhad.a}</td>
+                    `;
+                         } else {
+                             row11.innerHTML = `
+                        <td>赔率</td>  
+                          <td>${item.hhad.h}</td> 
+                        <td>${item.hhad.d}</td>						
+                        <td>${item.hhad.a}</td>
+                    `;
+                       }
+					    const td11 = document.createElement('td');
+                         const btn11 = document.createElement('button');
+                         btn11.classList.add('open-button');
+                         btn11.textContent = '变';
+                         btn11.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn11.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             showPopup(this, itemData, 1);
+                         });
+                         td11.appendChild(btn11);
+                         row11.appendChild(td11);
+                         row12.innerHTML = `
+                        <td>赔率胜率</td>  
+                        <td>${hhad.hProbability}</td> 
+                        <td>${hhad.dProbability}</td>						
+                        <td>${hhad.aProbability}</td>
+                        <td></td>
+                    `;
+                         row13.innerHTML = `
+                        <td>支持量</td>  
+                        <td>${hwin}</td> 
+                        <td>${hdraw}</td>						
+                        <td>${hlose}</td>
+                        <td></td>
+                    `;
+                         row14.innerHTML = `
+                        <td>总奖池</td>  
+                        <td colspan="3" style="text-align: center; vertical-align: middle; ">${htotal}</td> 
+                        <td></td>
+                    `;
+                         row15.innerHTML = `
+                        <td>奖池赔付</td>  
+                        <td>${hwinM}</td> 
+                        <td>${hdrawM}</td>						
+                        <td>${hloseM}</td>
+                        <td></td>
+                    `;
+                         row16.innerHTML = `
+                        <td>庄家盈亏</td>  
+                        <td>${hwinY}</td> 
+                        <td>${hdrawY}</td>						
+                        <td>${hloseY}</td>
+                        <td></td>
+                    `;
+                         row9.innerHTML = `
+                        <td colspan="5" style="text-align: center; vertical-align: middle; background: #ff5f5f;">下一场</td> 
+                        
+                    `;
+					 const row17 = document.createElement('tr');
+					  const row18 = document.createElement('tr');
+					   row17.innerHTML = `
+                        <td>盈利选项</td>  
+                        <td colspan="4">${memo}</td> 
+                    `;
+					 row18.innerHTML = `
+                        <td>亏损选项</td>  
+                        <td colspan="4">${content}</td> 
+                    `;
+                         tableBody.appendChild(row1);
+                         tableBody.appendChild(row2);
+                         tableBody.appendChild(row3);
+                         tableBody.appendChild(row4);
+                         tableBody.appendChild(row5);
+                         tableBody.appendChild(row6);
+                         tableBody.appendChild(row7);
+                         tableBody.appendChild(row8);
+						 tableBody.appendChild(row999);
+                         tableBody.appendChild(row10);
+                         tableBody.appendChild(row11);
+                         tableBody.appendChild(row12);
+                         tableBody.appendChild(row13);
+                         tableBody.appendChild(row14);
+                         tableBody.appendChild(row15);
+                         tableBody.appendChild(row16);
+						 tableBody.appendChild(row17);
+						 tableBody.appendChild(row18);
+						 tableBody.appendChild(row9);
+                     });
+					 get365YaList();
+                 } else {
+                     // 请求失败，处理错误
+                     console.error('请求失败，状态码：', xhr2.status);
+                 }
+             };
+
+             // 发送GET请求
+             xhr2.open('GET', url2, true);
+             xhr2.send();
+         } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr.open('GET', url, true);
+     xhr.send();
+ }
+ function count(num1, num2, symbol) {
+     let str1 = num1.toString();
+     let str2 = num2.toString();
+     let result,
+     len1,
+     len2,
+     step;
+     try {
+         len1 = str1.split('.')[1].length
+     } catch (e) {
+         len1 = 0
+     };
+     try {
+         len2 = str2.split('.')[1].length
+     } catch (e) {
+         len2 = 0
+     };
+     step = Math.pow(10, Math.max(len1, len2));
+     let a = parseInt(num1 * step);
+     let b = parseInt(num2 * step);
+     switch (symbol) {
+     case '+':
+         result = (a + b) / step
+         break;
+     case "-":
+         result = (a - b) / step
+         break;
+     case "*":
+         result = (a * b) / step / step
+         break;
+     case "/":
+         result = a / b
+             break;
+     default:
+         break;
+     }
+     return result;
+ }
+	</script>  
+</head>  
+
+<body>  
+ <button onclick="fetchData()" class = "pretty-btn">刷新</button>  
+ <a href="history.html" class= "beautified-link">回顾</a>
+  <a href="history2.html" class= "beautified-link">回顾2</a>
+ <table id="data-table">  
+    <thead>  
+        <tr>  
+            <th></th>  
+            <th>胜</th>  
+            <th>平</th>
+            <th>负</th> 		
+            <th></th> 
+        </tr>  
+    </thead>  
+    <tbody id="table-body"></tbody>  
+</table> 
+<div id="popupContainer"></div> 
+</body>  
+</html>

@@ -66,6 +66,7 @@
 .chart-dev {
     height: 300px;
     top: 20px;
+	  padding-bottom:20px;
 }
 	#chart-container {
   position: relative;
@@ -103,17 +104,179 @@
   border-radius: 10px; /* 圆角边框 */
   transition: all 0.3s; /* 过渡效果 */
 }
+h3 {
+    color: #3366ff; /* 设置字体颜色 */
+    font-size: 24px; /* 设置字体大小 */
+    border-bottom: 1px solid #ddd; /* 添加底部边框 */
+    padding-bottom: 10px; /* 添加底部填充 */
+    margin-bottom: 10px; /* 添加底部外边距 */
+  }
+   .tab-content { display: none; }
+    .tab {
+    display: inline-block;
+    background-color: #ddd;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  .tab.active {
+    background-color: #4CAF50; /* 绿色背景表示激活状态 */
+    color: white;
+  }
     </style>  	
 	<script>
+	var h;
+	var d;
+	var a;
+	var value;
+    var homeTeam;
+	var awayTeam;
+	var matchId ;
+	var str;
 	window.onload = function() {
   // 页面加载后调用的函数
+  var name = getQueryParams();
+  console.log(name);
+  h = name.h;
+  d = name.d;
+  a = name.a;
+  str = name.name;
+  matchId= name.matchId;
+  var goalLine = parseInt(name.goalLine);
+  if(goalLine>0){
+  value = a;
+  }else{
+  value = h;
+  }
+  homeTeam = name.homeTeam;
+  awayTeam = name.awayTeam;
+  var title = document.getElementById('title');
+  title.innerHTML = homeTeam + "VS" + awayTeam + "<br>胜："+h+"  平："+d+"  负："+a;
+  // 初始化：显示第一个tab内容
+  openTab('home1',1,0);
   fetchData();
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+function getQueryParams() {
+    const params = {};
+    window.location.search.substring(1).split("&").forEach((param) => {
+        let [key, value] = param.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+    return params;
+}
+
+/**document.addEventListener('DOMContentLoaded', function() {
          var vConsole = new window.VConsole();
          vConsole.init();
-    });
+    });*/
+	
+function openTab(tabName,type,status) {
+  // 获取所有tab内容和tab按钮
+  var tabContentElements = document.getElementsByClassName("tab-content");
+  var tabButtons = document.getElementsByClassName("tab");
+
+  // 隐藏所有tab内容，移除所有tab按钮的激活状态
+  for (var i = 0; i < tabContentElements.length; i++) {
+    tabContentElements[i].style.display = "none";
+    tabButtons[i].classList.remove("active");
+  }
+
+  // 显示选中的tab内容，给对应的tab按钮添加激活状态
+  document.getElementById(tabName).style.display = "block";
+  var selectedTab = document.getElementById(tabName).previousElementSibling;
+  selectedTab.classList.add("active");
+  if(type == 1 ){
+  showChartCustom(matchId, status,tabName);
+  }else{
+  showChart2Custom(matchId, status,tabName);
+  }
+  
+  
+}
+function  get365Ya(name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/get365Ya?name='+name;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			   var title = document.getElementById('title');
+               title.innerHTML = title.innerHTML + "<br> 亚盘：" + data.value4 + "  " + data.value5 + "   " + data.value6
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChartCustom(matchId, type,name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById(name);
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
+function  showChart2Custom(matchId, type,name){
+	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate2?matchId='+matchId+'&type='+type;
+	 var xhr2 = new XMLHttpRequest();
+     xhr2.onload = function () {
+         if (xhr2.status === 200) {
+		     var data = JSON.parse(xhr2.responseText);
+             console.log(data);
+			 var chartDom = document.getElementById(name);
+             var myChart = echarts.init(chartDom, null, {
+                 renderer: 'canvas',
+                  useDirtyRect: false
+              });
+             var app = {};
+
+             var option;
+			 option = data;
+			if (option && typeof option === 'object') {
+                myChart.setOption(option);
+             }
+
+            window.addEventListener('resize', myChart.resize);
+		 } else {
+             // 请求失败，处理错误
+             console.error('请求失败，状态码：', xhr2.status);
+         }
+     };
+
+     // 发送GET请求
+     xhr2.open('GET', url2, true);
+     xhr2.send();
+}
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -255,12 +418,13 @@ function  showChart2(itemData, type){
 	
  }
  function fetchData() {
+     get365Ya(str);
      const formattedDate = moment().format("YYYY-MM-DD");
 	 const today = moment();
 	 const twoDaysAgo = today.subtract(2, 'days');
 	 const formattedDate2 = twoDaysAgo.format('YYYY-MM-DD');
      // API接口的URL
-     var url = 'http://thj0425.gnway.cc/supportRateV1/getMatchResultV1';
+     var url = 'http://thj0425.gnway.cc/supportRateV1/getHistory?h='+ value;
 
      // 创建一个新的HTTP请求
      var xhr = new XMLHttpRequest();
@@ -276,25 +440,37 @@ function  showChart2(itemData, type){
                      tableBody.innerHTML = '';
                      // 遍历数据并创建表格行
                      data.forEach(item => {
-                         const row1 = document.createElement('tr');
+                    const row1 = document.createElement('tr');
 					if(item.bettingSingle == 1){
 					    row1.innerHTML = `
-                        <td><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">${item.matchNumStr}</div></td>  	
-						<td>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td rowspan='3'><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">${item.popularity}</div></td>  	
+						<td rowspan='3'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
                         <td>${item.winMoney}</td>	
                         <td>${item.goalLineMoney}</td>						
                         <td>${item.sectionsNo999}</td>
                     `;
 					}else{
                         row1.innerHTML = `
-                        <td>${item.matchNumStr}</td> 				
-                        <td>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td rowspan='3'>${item.popularity}</td> 				
+                        <td rowspan='3'>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
                         <td>${item.winMoney}</td>	
                         <td>${item.goalLineMoney}</td>						
                         <td>${item.sectionsNo999}</td>
                     `;
-					}					
+					}		
+                     const row2 = document.createElement('tr');	
+                     row2.innerHTML = ` 
+                        <td>${item.h}</td>	
+                        <td>${item.d}</td>						
+                        <td>${item.a}</td>	`
+                     const row3 = document.createElement('tr');	
+                     row3.innerHTML = ` 
+                        <td>${item.value1}</td>	
+                        <td>${item.value2}</td>						
+                        <td>${item.value3}</td>
+                        <td>${item.companyName}</td>						`						
                          const td3 = document.createElement('td');
+						 const td4 = document.createElement('td');
                          const btn3 = document.createElement('button');
                          btn3.classList.add('open-button');
                          btn3.textContent = '变';
@@ -317,15 +493,22 @@ function  showChart2(itemData, type){
                              const itemData = JSON.parse(this.getAttribute('data-item'));
                              showPopup(this, itemData, 1);
                          });
-                         td3.appendChild(btn4);
+                         td4.appendChild(btn4);
                          row1.appendChild(td3);
+						 row2.appendChild(td4);
 						 if(item.status == 0){
 						     row1.style.background = "#87df87";
+							 row2.style.background = "#87df87";
+							 row3.style.background = "#87df87";
 						 }else{
 						 	 row1.style.background = " rgb(239 112 111)";
+							 row2.style.background = " rgb(239 112 111)";
+							 row3.style.background = " rgb(239 112 111)";
 						 }
 						
                          tableBody.appendChild(row1);
+						 tableBody.appendChild(row2);
+						 tableBody.appendChild(row3);
                      });
          } else {
              // 请求失败，处理错误
@@ -379,12 +562,21 @@ function  showChart2(itemData, type){
 </head>  
 
 <body>  
- <a href="index.html" class= "beautified-link">前往今日赛事</a>
-  <button onclick="fetchData()" class = "pretty-btn">刷新</button>  
- <table id="data-table" style="font-size: 12px;">  
+ <a href="home.html" class= "beautified-link">前往今日赛事</a>
+  <button onclick="fetchData()" class = "pretty-btn">刷新</button>
+<h3 id="title"></h3>
+<div class="tabs">
+  <button class="tab" onclick="openTab('home1',1,0)">支持量</button>
+  <button class="tab" onclick="openTab('home2',2,0)">盈亏</button>
+  <button class="tab" onclick="openTab('home1',1,1)">让球量</button>
+  <button class="tab" onclick="openTab('home2',2,1)">让球盈亏</button>
+</div>
+<div id="home1" class= "chart-dev tab-content"></div>
+<div id="home2" class= "chart-dev tab-content"></div>  
+ <table id="data-table" style="font-size: 16px;">  
     <thead>  
         <tr>  
-            <th>编号</th>		
+            <th>人气</th>		
             <th>队伍</th>  
             <th>胜盈利</th>
             <th>让盈利</th> 

@@ -3,11 +3,11 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>亚盘数据</title>  
+    <title>历史数据</title>  
     <!-- 这里可以添加其他的头部信息，比如CSS样式表链接、JavaScript脚本链接等 -->  
-	<script src="echarts.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 	 <script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
+	 <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
 <style>  
  /* 假设 body 是滚动容器 */  
         body {  
@@ -72,12 +72,6 @@
   height: 100vh;
   overflow: hidden;
 }
-.red{
-   color:red
-}
-.blue{
-   color:blue
-}
 .beautified-link {
     /* 文字颜色 */
     color: #555;
@@ -95,27 +89,31 @@
     padding: 10px 10px;
     /* 鼠标悬停样式 */
     }
+	.pretty-btn {
+  background-color: #4CAF50; /* 绿色背景 */
+  border: none; /* 无边框 */
+  color: white; /* 白色文本 */
+  padding: 10px 10px; /* 内边距 */
+  text-align: center; /* 文本居中 */
+  text-decoration: none; /* 无文本装饰 */
+  display: inline-block; /* 行内块显示 */
+  font-size: 14px; /* 字体大小 */
+  margin: 4px 2px; /* 外边距 */
+  cursor: pointer; /* 手形鼠标光标 */
+  border-radius: 10px; /* 圆角边框 */
+  transition: all 0.3s; /* 过渡效果 */
+}
     </style>  	
 	<script>
-	var homeTeam;
-	var awayTeam;
 	window.onload = function() {
   // 页面加载后调用的函数
-  var name = getQueryParams();
-  console.log(name);
-  homeTeam = name.homeTeam;
-  awayTeam = name.awayTeam;
-  fetchData(name.name);
+  fetchData();
 };
 
-function getQueryParams() {
-    const params = {};
-    window.location.search.substring(1).split("&").forEach((param) => {
-        let [key, value] = param.split("=");
-        params[decodeURIComponent(key)] = decodeURIComponent(value);
+document.addEventListener('DOMContentLoaded', function() {
+         var vConsole = new window.VConsole();
+         vConsole.init();
     });
-    return params;
-}
 function  showChart(itemData, type){
 	 var url2 = 'http://thj0425.gnway.cc/supportRateV1/footBallRate?matchId='+itemData.matchId+'&type='+type;
 	 var xhr2 = new XMLHttpRequest();
@@ -200,30 +198,33 @@ function  showChart2(itemData, type){
      // 设置弹出框的内容
      var title = type == 0 ? '胜平负' : '让球胜平负';
      const popupContent = `
-        <h3 style="margin: 0;">${homeTeam}vs${awayTeam}</h3>`;
+        <h3 style="margin: 0;">${title}-${itemData.matchNumStr}-${itemData.homeTeam}vs${itemData.awayTeam}</h3>`;
      var tablePP = `<table id="data-table2">
     <thead>  
         <tr>  
             <th>时间</th>  
-            <th>主</th>  
-            <th>盘</th>
-            <th>客</th> 		
+            <th>胜</th>  
+            <th>平</th>
+            <th>负</th> 		
         </tr>  
     </thead>  
     <tbody id="table-body2">`;
-     var url = 'http://thj0425.gnway.cc/supportRateV1/getYaInfo?cid='+itemData.index+'&index=' + itemData.pid;
+     var url = 'https://webapi.sporttery.cn/gateway/jc/football/getFixedBonusV1.qry?clientCode=3001&matchId=' + itemData.matchId;
      // 创建一个新的HTTP请求
      var xhr = new XMLHttpRequest();
      xhr.onload = function () {
          if (xhr.status === 200) {
              var data = JSON.parse(xhr.responseText);
              console.log(data);
-                 data.forEach(item => {
-                 tablePP = tablePP + `<tr><td>${item.date}</td><td>${item.value4}</td><td>${item.value5}</td><td>${item.value6}</td></tr>`
+             var value1 = type == 0 ? data.value.oddsHistory.hadList : data.value.oddsHistory.hhadList
+                 value1.forEach(item => {
+                 tablePP = tablePP + `<tr><td>${item.updateTime}</td><td>${item.h}</td><td>${item.d}</td><td>${item.a}</td></tr>`
 
              });
              tablePP = tablePP + `</tbody>
 </table>
+<div id="main" class= "chart-dev"></div>
+<div id="main2" class= "chart-dev"></div>
 <button class="close-button">关闭</button>`;
              popupDiv.innerHTML = popupContent + tablePP;
 
@@ -239,6 +240,8 @@ function  showChart2(itemData, type){
 
              // 显示弹出框
              popupDiv.style.display = 'block';
+			 showChart(itemData,type);
+             showChart2(itemData,type);
              // 您还可以添加其他的逻辑，比如动画效果等
          } else {
              // 请求失败，处理错误
@@ -251,13 +254,13 @@ function  showChart2(itemData, type){
      xhr.send();
 	
  }
- function fetchData(name) {
+ function fetchData() {
      const formattedDate = moment().format("YYYY-MM-DD");
 	 const today = moment();
 	 const twoDaysAgo = today.subtract(2, 'days');
 	 const formattedDate2 = twoDaysAgo.format('YYYY-MM-DD');
      // API接口的URL
-     var url = 'http://thj0425.gnway.cc/supportRateV1/getYa?name='+name;
+     var url = 'http://thj0425.gnway.cc/supportRateV1/getMatchResultV1';
 
      // 创建一个新的HTTP请求
      var xhr = new XMLHttpRequest();
@@ -274,19 +277,39 @@ function  showChart2(itemData, type){
                      // 遍历数据并创建表格行
                      data.forEach(item => {
                          const row1 = document.createElement('tr');
+					if(item.bettingSingle == 1){
+					    row1.innerHTML = `
+                        <td><div class="hadGL" style="background-image:url(	https://static.sporttery.cn/res_1_0/jcw/images/jc_calculator/single.gif);background-repeat:no-repeat;background-position:left top;">${item.matchNumStr}</div></td>  	
+						<td>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td>${item.winMoney}</td>	
+                        <td>${item.goalLineMoney}</td>						
+                        <td>${item.sectionsNo999}</td>
+                    `;
+					}else{
                         row1.innerHTML = `
-                        <td>${item.companyName}</td>  
-                        <td>${item.value1}</td> 
-						<td>${item.value2}</td> 
-						<td>${item.value3}</td> 
-                      	<td>${item.value4}</td> 
-						<td>${item.value5}</td> 
-						<td>${item.value6}</td> 	
-                        `
-						 const td3 = document.createElement('td');
+                        <td>${item.matchNumStr}</td> 				
+                        <td>${item.homeTeam}(${item.goalLine})VS${item.awayTeam}</td> 
+                        <td>${item.winMoney}</td>	
+                        <td>${item.goalLineMoney}</td>						
+                        <td>${item.sectionsNo999}</td>
+                    `;
+					}					
+                         const td3 = document.createElement('td');
+                         const btn3 = document.createElement('button');
+                         btn3.classList.add('open-button');
+                         btn3.textContent = '变';
+                         btn3.setAttribute('data-item', JSON.stringify(item));
+                         // 为按钮添加点击事件监听器
+                         btn3.addEventListener('click', function () {
+                             // 从 data-item 属性中解析数据对象
+                             const itemData = JSON.parse(this.getAttribute('data-item'));
+                             showPopup(this, itemData, 0);
+                         });
+                         td3.appendChild(btn3);
+                     
                          const btn4 = document.createElement('button');
                          btn4.classList.add('open-button');
-                         btn4.textContent = '详';
+                         btn4.textContent = '让';
                          btn4.setAttribute('data-item', JSON.stringify(item));
                          // 为按钮添加点击事件监听器
                          btn4.addEventListener('click', function () {
@@ -296,6 +319,12 @@ function  showChart2(itemData, type){
                          });
                          td3.appendChild(btn4);
                          row1.appendChild(td3);
+						 if(item.status == 0){
+						     row1.style.background = "#87df87";
+						 }else{
+						 	 row1.style.background = " rgb(239 112 111)";
+						 }
+						
                          tableBody.appendChild(row1);
                      });
          } else {
@@ -350,18 +379,17 @@ function  showChart2(itemData, type){
 </head>  
 
 <body>  
- <a href="index.html" class= "beautified-link">前往今日赛事</a>
+ <a href="home.html" class= "beautified-link">前往今日赛事</a>
+  <button onclick="fetchData()" class = "pretty-btn">刷新</button>  
  <table id="data-table" style="font-size: 12px;">  
     <thead>  
         <tr>  
-            <th>机构</th>  
-            <th>初主</th>  
-            <th>初盘</th>
-            <th>初客</th> 		
-            <th>即主</th>  
-            <th>即盘</th>
-            <th>即客</th>
-            <th></th> 			
+            <th>编号</th>		
+            <th>队伍</th>  
+            <th>胜盈利</th>
+            <th>让盈利</th> 
+            <th>赛果</th> 			
+            <th>功能</th> 
         </tr>  
     </thead>  
     <tbody id="table-body"></tbody>  
